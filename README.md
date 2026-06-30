@@ -11,3 +11,7 @@ pip3 install -r requirements.txt
 ```bash
 python3 -m src.main
 ```
+
+### Dataset Source
+
+https://www.kaggle.com/datasets/ziya07/network-traffic-anomaly-detection-dataset/data
