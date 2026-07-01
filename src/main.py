@@ -1,5 +1,7 @@
 import pandas as pd
 from src.config import ANOMALY_LABEL, DATA_PATH, NORMAL_LABEL, PROCESSED_DIR
+from src.eda import run_eda
+from src.preprocess import run_preprocess
 
 def load_dataset(path=DATA_PATH) -> pd.DataFrame:
     return pd.read_csv(path)
@@ -27,6 +29,9 @@ def main() -> None:
 
     df_normal, df_anomaly = split_normal_anomaly(df)
     save_splits(df_normal, df_anomaly)
+
+    run_eda(df)
+    run_preprocess(df, df_normal)
 
 if __name__ == "__main__":
     main()
