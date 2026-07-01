@@ -3,6 +3,7 @@ from src.config import ANOMALY_LABEL, DATA_PATH, NORMAL_LABEL, PROCESSED_DIR
 from src.eda import run_eda
 from src.preprocess import run_preprocess
 from src.splits import run_splits
+from src.train import run_train
 
 def load_dataset(path=DATA_PATH) -> pd.DataFrame:
     return pd.read_csv(path)
@@ -33,13 +34,20 @@ def main() -> None:
 
     run_eda(df)
     run_preprocess(df, df_normal)
-    meta = run_splits(df_normal, df_anomaly)["meta"]
+    split_out = run_splits(df_normal, df_anomaly)
+    meta = split_out["meta"]
 
     print(f"\nTrain/test splits saved to /{PROCESSED_DIR.name}/")
     print(f"  Normal train: {meta.train} rows")
     print(f"  Normal test:  {meta.normal_test} rows")
     print(f"  Anomaly test: {meta.anomaly_test} rows")
     print(f"  Combined test: {meta.test} rows")
+
+    train_out = run_train(split_out["splits"])
+    train_meta = train_out["save_meta"]
+
+    print(f"\nOne-Class SVM trained on {train_meta['train_rows']} normal samples")
+    print(f"\nModel saved to /{PROCESSED_DIR.name}/ocsvm_model.pkl")
 
 if __name__ == "__main__":
     main()
