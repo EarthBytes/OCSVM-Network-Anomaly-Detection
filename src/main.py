@@ -19,21 +19,14 @@ def split_normal_anomaly(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     df_anomaly = df[df['label'] == ANOMALY_LABEL].copy()
     return df_normal, df_anomaly
 
-def save_splits(df_normal: pd.DataFrame, df_anomaly: pd.DataFrame) -> None:
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    df_normal.to_csv(PROCESSED_DIR / "df_normal.csv", index=False)
-    df_anomaly.to_csv(PROCESSED_DIR / "df_anomaly.csv", index=False)
-    print(f"\nSaved normal and anomaly splits to /{PROCESSED_DIR.name}/")
-
 def main() -> None:
     df = load_dataset()
     dataset_info(df)
 
     df_normal, df_anomaly = split_normal_anomaly(df)
-    save_splits(df_normal, df_anomaly)
 
     run_eda(df)
-    run_preprocess(df, df_normal)
+    run_preprocess(df)
     split_out = run_splits(df_normal, df_anomaly)
     meta = split_out["meta"]
 

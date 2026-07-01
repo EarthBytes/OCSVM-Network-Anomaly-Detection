@@ -1,9 +1,4 @@
-import joblib
-import numpy as np 
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
-
-from src.config import PROCESSED_DIR
 
 LABEL_COL = "label"
 DROP_COLS = ["mean_packet_size"]
@@ -51,58 +46,12 @@ def prepare_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series, list[st
 
     return X, y, feature_cols, meta
 
-def fit_scaler(X_normal: pd.DataFrame) -> StandardScaler:
-    scaler = StandardScaler()
-    scaler.fit(X_normal)
-    return scaler
-
-def scale_feature(X: pd.DataFrame, scaler: StandardScaler) -> np.ndarray:
-    return scaler.transform(X)
-
-def save_preprossed(
-        X: pd.DataFrame,
-        y: pd.Series,
-        scaler: StandardScaler,
-        feature_cols: list[str],
-) -> dict:
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-
-    X_scaled = scale_feature(X, scaler)
-    X_scaled_df = pd.DataFrame(X_scaled, columns=feature_cols)
-
-    paths = {
-        "X_featres": PROCESSED_DIR / "X_features.csv",
-        "X_scaled": PROCESSED_DIR / "X_scaled.csv",
-        "y_labels": PROCESSED_DIR / "y_labels.csv",
-        "scaler": PROCESSED_DIR / "scaler.pkl",
-    }      
-
-    X.to_csv(paths["X_featres"], index=False)
-    X_scaled_df.to_csv(paths["X_scaled"], index=False)
-    y.to_csv(paths["y_labels"], index=False)
-    joblib.dump(scaler, paths["scaler"])
-
-    return {
-        "saved_paths": {k: str(v) for k, v in paths.items()},
-        "rows": len(X),
-        "features": len(feature_cols),
-    }
-
-def run_preprocess(
-        df: pd.DataFrame,
-        df_normal: pd.DataFrame
-) -> dict:
+def run_preprocess(df: pd.DataFrame) -> dict:
     X, y, feature_cols, prep_meta = prepare_features(df)
-    X_normal, _, _, prep_meta_normal = prepare_features(df_normal)
-
-    scaler = fit_scaler(X_normal)
-    save_meta = save_preprossed(X, y, scaler, feature_cols)
 
     return {
        "X": X,
         "y": y,
         "feature_cols": feature_cols,
         "prep_meta": prep_meta,
-        "prep_meta_normal": prep_meta_normal,
-        "save_meta": save_meta,
     }
