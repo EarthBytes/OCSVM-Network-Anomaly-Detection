@@ -2,6 +2,7 @@ import pandas as pd
 from src.config import ANOMALY_LABEL, DATA_PATH, NORMAL_LABEL, PROCESSED_DIR
 from src.eda import run_eda
 from src.preprocess import run_preprocess
+from src.splits import run_splits
 
 def load_dataset(path=DATA_PATH) -> pd.DataFrame:
     return pd.read_csv(path)
@@ -32,6 +33,13 @@ def main() -> None:
 
     run_eda(df)
     run_preprocess(df, df_normal)
+    meta = run_splits(df_normal, df_anomaly)["meta"]
+
+    print(f"\nTrain/test splits saved to /{PROCESSED_DIR.name}/")
+    print(f"  Normal train: {meta.train} rows")
+    print(f"  Normal test:  {meta.normal_test} rows")
+    print(f"  Anomaly test: {meta.anomaly_test} rows")
+    print(f"  Combined test: {meta.test} rows")
 
 if __name__ == "__main__":
     main()
